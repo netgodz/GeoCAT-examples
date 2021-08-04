@@ -116,3 +116,50 @@ axs[1].plot(np.imag(no_tide)[start:end])
 
 # Show plot
 fig.show()
+
+#dataset 2
+dataset2 = xr.load_dataarray(
+    gdf.get("netcdf_files/sfbay_2020_met.nc"))
+
+data2 = dataset2.loc[:,'Water Temp (°C)']
+time2 = dataset2.loc[:,'Time (GMT)']
+
+data2[data2=='-'] = np.nan
+data2 = data2.astype(float)
+
+# bad_indexes = np.isnan(data2)
+# good_indexes = np.logical_not(bad_indexes)
+# good_data = data2[good_indexes]
+# interpolated = np.interp(bad_indexes.nonzero(), good_indexes.nonzero(), good_data)
+# data2[bad_indexes] = interpolated
+
+
+
+index = -1
+for d2 in data2:
+    index+=1
+    if np.isnan(d2):
+        data2[index]=(data2[index-1]+data2[index+1])/2 #interp nans
+        print(index)
+
+fig, axs = plt.subplots(1,1, dpi=100,figsize=(8,4),constrained_layout=True)
+axs.set_title('Water Surface Temp')
+axs.plot(data2)
+fig.show()
+
+data_freq2 = 1 #points per hour
+res2 = data_freq2/(len(data2))
+year2low = res2*1
+year2high = res2*2
+year_only = fourier_filter(data2, data_freq2, cutoff_frequency_low=year2low,cutoff_frequency_high=year2high,band_block=True)
+np.imag(year_only).plot()
+np.real(year_only).plot()
+
+fig, axs = plt.subplots(2,1, dpi=100,figsize=(8,4),constrained_layout=True)
+axs[0].set_title('real')
+axs[0].plot(np.real(np.fft.fft(year_only))[1:5000])
+#axs[0].plot(np.real(np.fft.fft(year_only))[-10:])
+axs[1].set_title('imag')
+axs[1].plot(np.imag(np.fft.fft(year_only))[1:5000])
+#axs[1].plot(np.imag(np.fft.fft(year_only))[-10:])
+fig.show()
