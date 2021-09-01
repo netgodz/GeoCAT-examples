@@ -93,7 +93,7 @@ def animate(i):
 
 
 # runs the animation initiated with the frame from init and progressed with the animate function
-anim = animation.FuncAnimation(fig, animate, frames=30, interval=200)
+anim = animation.FuncAnimation(fig, animate, frames=29, interval=200)
 
 # Uncomment this line to save the created animation
 anim.save('animate_1.gif', writer='pillow', fps=5)
